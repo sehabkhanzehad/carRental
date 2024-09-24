@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
+            $table->string('otp')->nullable();
+            $table->string("role")->default("customer");
+            $table->timestamp("created_at")->useCurrent();
+            $table->timestamp("updated_at")->useCurrent()->useCurrentOnUpdate();
         });
     }
 
