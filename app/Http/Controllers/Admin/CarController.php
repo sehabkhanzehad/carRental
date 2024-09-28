@@ -4,13 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Car;
+use App\Models\Rental;
 use Illuminate\Http\Request;
 
 class CarController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('pages.admin-dashboard.management.cars');
@@ -20,25 +18,9 @@ class CarController extends Controller
     {
         try {
             $cars = Car::all();
-        return response()->json([
-            "status" => "success",
-            "data" => $cars,
-        ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "status" => "failed",
-                "message" => "Something went wrong, Please try again.",
-            ], 500);
-        }
-    }
-
-    public function getSingleCar($id)
-    {
-        try {
-            $car = Car::where('id', $id)->first();
             return response()->json([
                 "status" => "success",
-                "car" => $car,
+                "data" => $cars,
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -48,18 +30,22 @@ class CarController extends Controller
         }
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getSingleCar(string $id)
     {
-        //
+        try {
+            $car = Car::where('id', $id)->first();
+            return response()->json([
+                "status" => "success",
+                "data" => $car,
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => "failed",
+                "message" => "Something went wrong, Please try again.",
+            ], 500);
+        }
     }
 
-    /**
-     * Store car details.
-     */
     public function store(Request $request)
     {
         try {
@@ -92,26 +78,7 @@ class CarController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update car details.
-     */
-    public function update(Request $request, string $id)
+    public function updateCar(Request $request, string $id)
     {
         try {
             if ($request->hasFile('image')) {
@@ -166,22 +133,29 @@ class CarController extends Controller
         }
     }
 
-    /**
-     * Remove car details.
-     */
     public function destroy(string $id)
     {
         try {
             // $id = $request->input('id');
-            $car = Car::where('id', $id)->first();
-            $carImage = $car->image;
-            unlink(public_path($carImage));
-            $car->delete();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Car deleted successfully.',
-            ], 200);
+            $haveRental = Rental::where('car_id', $id)->first();
+
+            if ($haveRental != null) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Car cannot be deleted. Car is rented.',
+                ], status: 200);
+            } else {
+                $car = Car::where('id', $id)->first();
+                $carImage = $car->image;
+                unlink(public_path($carImage));
+                $car->delete();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Car deleted successfully.',
+                ], 200);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'failed',

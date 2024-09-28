@@ -1,3 +1,8 @@
+@php
+    $user = \App\Models\User::where("role", "admin")->first();
+@endphp
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -64,7 +69,7 @@
                 <ul class="nav">
                     <li class="nav-item nav-category">Main</li>
                     <li class="nav-item">
-                        <a href="" class="nav-link">
+                        <a href="{{ route("admin.dashboard") }}" class="nav-link">
                             <i class="link-icon" data-feather="box"></i>
                             <span class="link-title">Dashboard</span>
                         </a>
@@ -74,31 +79,21 @@
 
                     <li class="nav-item nav-category">Management</li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="collapse" href="#management" role="button" aria-expanded="false"
-                            aria-controls="management">
-                            <i class="link-icon" data-feather="mail"></i>
-                            <span class="link-title">Email</span>
-                            <i class="link-arrow" data-feather="chevron-down"></i>
-                        </a>
-                        <div class="collapse" id="management">
-                            <ul class="nav sub-menu">
-                                <li class="nav-item">
-                                    <a href="" class="nav-link">Inbox</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="" class="nav-link">Read</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="" class="nav-link">Compose</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="nav-item">
                         <a href="{{ route("admin.cars.index") }}" class="nav-link">
                             <i class="link-icon" data-feather="sliders"></i>
                             <span class="link-title">Cars</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route("admin.customers.index") }}" class="nav-link">
+                            <i class="link-icon" data-feather="users"></i>
+                            <span class="link-title">Customers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route("admin.rentals.index") }}" class="nav-link">
+                            <i class="link-icon" data-feather="box"></i>
+                            <span class="link-title">Rental</span>
                         </a>
                     </li>
 
@@ -483,7 +478,7 @@
                                 </div>
                             </div>
                         </li> --}}
-                        <li class="nav-item dropdown nav-messages">
+                        {{-- <li class="nav-item dropdown nav-messages">
                             <a class="nav-link dropdown-toggle" href="#" id="messageDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i data-feather="mail"></i>
@@ -624,20 +619,21 @@
                                     <a href="javascript:;">View all</a>
                                 </div>
                             </div>
-                        </li>
+                        </li> --}}
                         <li class="nav-item dropdown nav-profile">
                             <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img src="https://via.placeholder.com/30x30" alt="profile">
+                                {{-- <img src="https://via.placeholder.com/30x30" alt="profile"> --}}
+                                <h5>{{ $user->name }}</h5>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="profileDropdown">
                                 <div class="dropdown-header d-flex flex-column align-items-center">
-                                    <div class="figure mb-3">
+                                    {{-- <div class="figure mb-3">
                                         <img src="https://via.placeholder.com/80x80" alt="">
-                                    </div>
+                                    </div> --}}
                                     <div class="info text-center">
-                                        <p class="name font-weight-bold mb-0">Amiah Burton</p>
-                                        <p class="email text-muted mb-3">amiahburton@gmail.com</p>
+                                        <p class="name font-weight-bold mb-0">{{ $user->name }}</p>
+                                        <p class="email text-muted mb-3">{{ $user->email }}</p>
                                     </div>
                                 </div>
                                 <div class="dropdown-body">
@@ -648,7 +644,7 @@
                                                 <span>Profile</span>
                                             </a>
                                         </li> --}}
-                                        <li class="nav-item">
+                                        {{-- <li class="nav-item">
                                             <a href="" class="nav-link">
                                                 <i data-feather="edit"></i>
                                                 <span>Edit Profile</span>
@@ -659,7 +655,7 @@
                                                 <i data-feather="repeat"></i>
                                                 <span>Switch User</span>
                                             </a>
-                                        </li>
+                                        </li> --}}
                                         <li class="nav-item">
                                             <a href="{{ route("auth.sign-out") }}" class="nav-link">
                                                 <i data-feather="log-out"></i>
@@ -684,7 +680,7 @@
                 <p class="text-muted text-center text-md-left">Copyright © 2024{{-- <a href="https://rndglobalnest.com/" target="_blank">RND Global Nest</a> --}}. All rights
                     reserved</p>
                 <p class="text-muted text-center text-md-left mb-0 d-none d-md-block"><a
-                        href="https://rndglobalnest.com/" target="_blank">RND Global Nest</a> <i
+                        href="{{ route("homepage") }}" target="_blank">CAR RENTAL</a> <i
                         class="mb-1 text-primary ml-1 icon-small" data-feather="heart"></i></p>
             </footer>
             <!-- partial -->

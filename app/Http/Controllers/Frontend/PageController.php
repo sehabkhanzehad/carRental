@@ -4,62 +4,72 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Helper\JwtToken;
+use App\Models\Car;
+use App\Models\Rental;
+use App\Models\User;
 
 class PageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+    public static function check(Request $request){
+        $token = $request->cookie('userSignInToken');
+        if ($token) {
+            $result = JwtToken::decodeToken($token);
+            $customerId = $result->id;
+            $customerEmail = $result->email;
+            $customer = User::where('id', $customerId)->where('email', $customerEmail)->where("role", "customer")->first();
+
+            return $customer;
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function showHomepage(Request $request)
     {
-        //
+        $token = $request->cookie('userSignInToken');
+        if ($token) {
+            $result = JwtToken::decodeToken($token);
+            $customerId = $result->id;
+            $customerEmail = $result->email;
+            $customer = User::where('id', $customerId)->where('email', $customerEmail)->where("role", "customer")->first();
+
+            $cars = Car::where('availability', true)->get();
+            return view('pages.homepage.index', compact('cars', 'customer'));
+        }
+        $cars = Car::where('availability', true)->get();
+
+        return view('pages.homepage.index', compact('cars'));
+    }
+    public function aboutPage(Request $request)
+    {
+        return view('pages.homepage.about', [
+            'customer' => $this->check(request()),
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function contactPage(Request $request)
     {
-        //
+        return view('pages.homepage.contact', [
+            'customer' => $this->check(request()),
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function rentals(Request $request)
     {
-        //
+        $cars = Car::where('availability', true)->get();
+        return view('pages.homepage.cars', [
+            'cars' => $cars,
+            'customer' => $this->check(request()),
+        ]);
+    }
+    public function history(Request $request)
+    {
+        $userId = $request->header("customerId");
+
+        $rentals = Rental::with("car")->where("user_id", $userId)->get();
+        return view('pages.homepage.history',[
+            'rentals' => $rentals,
+            'customer' => $this->check(request()),
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

@@ -223,10 +223,10 @@ class AuthController extends Controller
                 }else {
                     return response()->json([
                         'status' => 'success',
-                        'url' => route('customer.dashboard'),
+                        'url' => route('homepage'),
                         'message' => 'Sign in Successful.',
                         'token' => $token
-                    ], 200)->cookie('signInToken', $token, 60 * 24); // set cookie for 1 day
+                    ], 200)->cookie('userSignInToken', $token, 60 * 24); // set cookie for 1 day
                 }
             } else {
                 return response()->json([
@@ -249,6 +249,6 @@ class AuthController extends Controller
 
     public function signOut()
     {
-        return redirect(route('user.sign-in'))->cookie('signInToken', null, -1);
+        return redirect(route('homepage'))->cookie('userSignInToken', null, -1);
     }
 }

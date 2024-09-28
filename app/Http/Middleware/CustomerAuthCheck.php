@@ -17,7 +17,7 @@ class CustomerAuthCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $signInToken = $request->cookie('signInToken');
+        $signInToken = $request->cookie('userSignInToken');
         $result = JwtToken::decodeToken($signInToken);
 
         if($result == "Unauthorized"){
@@ -26,8 +26,8 @@ class CustomerAuthCheck
             $user = User::where('id',  $result->id)->where('email', $result->email)->first();
 
             if($user->role == 'customer'){
-                $request->headers->set('email', $result->email);
-                $request->headers->set('id', $result->id);
+                $request->headers->set('customerEmail', $result->email);
+                $request->headers->set('customerId', $result->id);
                 return $next($request);
             } else{
                 return redirect()->route('user.sign-in')->with('error', 'Unauthorized');

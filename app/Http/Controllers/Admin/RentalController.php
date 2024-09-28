@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Rental;
 use Illuminate\Http\Request;
 
 class RentalController extends Controller
@@ -12,54 +13,32 @@ class RentalController extends Controller
      */
     public function index()
     {
-        //
+        return view('pages.admin-dashboard.management.rentals');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getAllRentals()
     {
-        //
+        $rentals = Rental::with('car', 'user')->orderBy('start_date', 'asc')->get();
+        return response()->json([
+            "data" => $rentals
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        try {
+            $rental = Rental::find($id);
+            $rental->delete();
+            return response()->json([
+                "status" => "success",
+                "message" => "Rental cancelled successfully"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => "failed",
+                "message" => "Failed to cancel rental",
+                "error" => $e->getMessage()
+            ]);
+        }
     }
 }

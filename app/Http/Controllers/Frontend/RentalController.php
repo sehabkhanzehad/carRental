@@ -3,63 +3,55 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Mail\Rent;
+use App\Models\Rental;
 use Illuminate\Http\Request;
+use App\Models\Car;
+use Illuminate\Support\Facades\Mail;
 
 class RentalController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public $adminEmail = "sehabkhanzehad@yahoo.com";
+    public function store()
     {
-        //
-    }
+       try {
+        $data = json_decode(request()->cookie('data'));
+        $customer = CarController::check(request());
+        $car = Car::find($data->car_id);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $isAvailable = Rental::where('car_id', $data->car_id)
+            ->where(function ($query) use ($data) {
+                $query->whereBetween('start_date', [$data->pick_date, $data->drop_date])
+                    ->orWhereBetween('end_date', [$data->pick_date, $data->drop_date]);
+            })->doesntExist();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if (!$isAvailable) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Car is not available for the selected dates.',
+            ], 200)->cookie('data', null, -1);
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        Mail::to($customer->email)->send(new Rent($data, $customer, $car));
+        Mail::to($this->adminEmail)->send(new Rent($data, $customer, $car));
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+       Rental::create([
+            'user_id' => $customer->id,
+            'car_id' => $data->car_id,
+            'start_date' => $data->pick_date,
+            'end_date' => $data->drop_date,
+            'total_cost' => $data->total_cost,
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Booking confirmed. Check your email for more details.',
+        ], 200)->cookie('data', null, -1);
+       } catch (\Throwable $th) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => "Something went wrong, please try again.",
+            'error' => $th->getMessage(),
+        ], 400);
+       }
     }
 }
