@@ -56,7 +56,7 @@
         <!-- partial:partials/_sidebar.html -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <a style="font-size: 20px" href="#" class="sidebar-brand">
+                <a style="font-size: 20px" href="{{ route("admin.dashboard") }}" class="sidebar-brand">
                     CAR<span>RENTAL</span>
                 </a>
                 <div class="sidebar-toggler not-active">
